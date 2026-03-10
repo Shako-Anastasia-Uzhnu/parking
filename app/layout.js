@@ -1,5 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,17 +14,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "ParkSmart — Система управління автостоянкою",
-  description: "Розумна система для обліку паркомісць, клієнтів та автоматичного розрахунку оплати",
+  title: "ParkSmart — Автостоянка",
+  description: "Охоронювана цілодобова стоянка в центрі міста.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html lang="uk">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}>
+        <Header />
+        <main className="flex-1">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );

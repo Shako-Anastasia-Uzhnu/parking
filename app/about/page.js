@@ -1,13 +1,8 @@
 import Link from "next/link";
+
 export default function About() {
   return (
-    <div className="min-h-screen bg-gray-50">
-
-     
-      <nav className="bg-slate-900 text-white px-6 py-4 flex items-center gap-6">
-        <Link href="/" className="text-yellow-400 font-bold text-xl">🅿️ ParkSmart</Link>
-        <Link href="/" className="text-gray-300 hover:text-white transition text-sm">← Головна</Link>
-      </nav>
+    <div>
 
       
       <section className="bg-gradient-to-r from-slate-700 to-slate-900 text-white py-16">
@@ -35,7 +30,7 @@ export default function About() {
           </p>
         </div>
 
-     \
+        
         <div className="bg-white rounded-xl shadow-md p-8">
           <h2 className="text-2xl font-bold text-slate-800 mb-6">📋 Основні показники</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
@@ -54,6 +49,7 @@ export default function About() {
           </div>
         </div>
 
+       
         <div className="bg-white rounded-xl shadow-md p-8">
           <h2 className="text-2xl font-bold text-slate-800 mb-6">💳 Тарифи</h2>
           <div className="space-y-4">
@@ -96,7 +92,7 @@ export default function About() {
           </div>
         </div>
 
-  
+      
         <div className="bg-white rounded-xl shadow-md p-8">
           <h2 className="text-2xl font-bold text-slate-800 mb-4">📍 Розташування та графік</h2>
           <div className="space-y-3 text-gray-600">
@@ -108,7 +104,7 @@ export default function About() {
 
       </div>
 
-     
+      
       <div className="text-center pb-14">
         <Link
           href="/"
@@ -117,13 +113,6 @@ export default function About() {
           ← Повернутись на головну
         </Link>
       </div>
-
-      
-      <footer className="bg-slate-900 text-white py-8">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-400">© 2026 ParkSmart — Автостоянка</p>
-        </div>
-      </footer>
 
     </div>
   );
