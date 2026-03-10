@@ -14,7 +14,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "ParkSmart — Автостоянка",
+  title: {
+    default: "ParkSmart — Автостоянка",
+    template: "%s | ParkSmart",
+  },
   description: "Охоронювана цілодобова стоянка в центрі міста.",
 };
 
