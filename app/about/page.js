@@ -2,9 +2,7 @@ import Link from "next/link";
 
 export default function About() {
   return (
-    <div>
-
-      
+    <div className="bg-gray-50 min-h-screen">
       <section className="bg-gradient-to-r from-slate-700 to-slate-900 text-white py-16">
         <div className="container mx-auto px-4 text-center">
           <div className="text-5xl mb-4">🅿️</div>
@@ -16,8 +14,6 @@ export default function About() {
       </section>
 
       <div className="container mx-auto px-4 max-w-4xl py-14 space-y-8">
-
-        
         <div className="bg-white rounded-xl shadow-md p-8">
           <h2 className="text-2xl font-bold text-slate-800 mb-4">🏢 Про стоянку</h2>
           <p className="text-gray-600 leading-relaxed mb-4">
@@ -30,7 +26,6 @@ export default function About() {
           </p>
         </div>
 
-        
         <div className="bg-white rounded-xl shadow-md p-8">
           <h2 className="text-2xl font-bold text-slate-800 mb-6">📋 Основні показники</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
@@ -49,7 +44,6 @@ export default function About() {
           </div>
         </div>
 
-       
         <div className="bg-white rounded-xl shadow-md p-8">
           <h2 className="text-2xl font-bold text-slate-800 mb-6">💳 Тарифи</h2>
           <div className="space-y-4">
@@ -70,7 +64,6 @@ export default function About() {
           </div>
         </div>
 
-        
         <div className="bg-white rounded-xl shadow-md p-8">
           <h2 className="text-2xl font-bold text-slate-800 mb-6">✅ Інфраструктура</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -92,7 +85,6 @@ export default function About() {
           </div>
         </div>
 
-      
         <div className="bg-white rounded-xl shadow-md p-8">
           <h2 className="text-2xl font-bold text-slate-800 mb-4">📍 Розташування та графік</h2>
           <div className="space-y-3 text-gray-600">
@@ -101,10 +93,8 @@ export default function About() {
             <p>📞 <strong>Телефон адміністратора:</strong> +38 (044) 123-45-67</p>
           </div>
         </div>
-
       </div>
 
-      
       <div className="text-center pb-14">
         <Link
           href="/"
@@ -113,7 +103,6 @@ export default function About() {
           ← Повернутись на головну
         </Link>
       </div>
-
     </div>
   );
 }
