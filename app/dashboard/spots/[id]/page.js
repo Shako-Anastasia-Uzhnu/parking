@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSpotById } from "@/lib/parking";
+import SpotActions from "@/components/SpotActions";
 
 export default async function SpotDetailPage({ params }) {
   const { id } = await params;
@@ -20,14 +21,7 @@ export default async function SpotDetailPage({ params }) {
             <span className="text-5xl">{spot.emoji}</span>
             <h1 className="text-3xl font-bold text-gray-900">{spot.name}</h1>
           </div>
-          <div className="space-x-2">
-            <button className="bg-yellow-400 text-slate-900 px-4 py-2 rounded hover:bg-yellow-300 font-semibold">
-              Редагувати
-            </button>
-            <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-              Видалити
-            </button>
-          </div>
+          <SpotActions spotId={spot.id} />
         </div>
 
         <div className="grid grid-cols-2 gap-6">

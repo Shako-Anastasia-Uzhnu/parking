@@ -1,15 +1,5 @@
-import DashboardNav from "@/components/DashboardNav";
+import DashboardShell from "@/components/DashboardShell";
 
 export default function DashboardLayout({ children }) {
-  return (
-    <div className="flex min-h-[calc(100vh-130px)]">
-      <aside className="w-64 bg-slate-800 text-white p-6">
-        <h2 className="text-xl font-bold mb-6 text-yellow-400">🅿️ Dashboard</h2>
-        <DashboardNav />
-      </aside>
-      <div className="flex-1 bg-gray-100 p-8">
-        {children}
-      </div>
-    </div>
-  );
+  return <DashboardShell>{children}</DashboardShell>;
 }
