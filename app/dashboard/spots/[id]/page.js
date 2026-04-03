@@ -1,53 +1,58 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getSpotById } from "@/lib/parking";
-import SpotActions from "@/components/SpotActions";
+import { parkingSpots } from "@/lib/parking";
 
-export default async function SpotDetailPage({ params }) {
-  const { id } = await params;
-  const spot = getSpotById(id);
+export const metadata = { title: "Управління паркомісцями" };
 
-  if (!spot) notFound();
+export default async function SpotsListPage() {
+  await new Promise(resolve => setTimeout(resolve, 1000))
 
   return (
     <div>
-      <Link href="/dashboard/spots" className="text-slate-700 hover:underline mb-4 inline-block">
-        ← Назад до списку
-      </Link>
-
-      <div className="bg-white rounded-lg shadow p-8">
-        <div className="flex justify-between items-start mb-6">
-          <div className="flex items-center gap-4">
-            <span className="text-5xl">{spot.emoji}</span>
-            <h1 className="text-3xl font-bold text-gray-900">{spot.name}</h1>
-          </div>
-          <SpotActions spotId={spot.id} />
-        </div>
-
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-gray-500 text-sm font-bold mb-1">Категорія</h3>
-            <p className="text-lg text-gray-900">{spot.category}</p>
-          </div>
-          <div>
-            <h3 className="text-gray-500 text-sm font-bold mb-1">Ціна</h3>
-            <p className="text-lg text-gray-900">{spot.price} грн/год</p>
-          </div>
-          <div>
-            <h3 className="text-gray-500 text-sm font-bold mb-1">Статус</h3>
-            {spot.available ? (
-              <span className="text-green-600 font-semibold">🟢 Вільне</span>
-            ) : (
-              <span className="text-red-600 font-semibold">🔴 Зайняте</span>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <h3 className="text-gray-500 text-sm font-bold mb-2">Опис</h3>
-          <p className="text-gray-700">{spot.description}</p>
-        </div>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Паркомісця</h1>
+        <Link href="/dashboard/spots/new" className="bg-yellow-400 text-slate-900 px-6 py-2 rounded font-semibold hover:bg-yellow-300 transition">
+          + Додати місце
+        </Link>
+      </div>
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Назва</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Категорія</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ціна</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Статус</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Дії</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {parkingSpots.map((spot) => (
+              <tr key={spot.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-2">
+                    <span>{spot.emoji}</span>
+                    <span className="font-medium text-gray-900">{spot.name}</span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 text-gray-700">{spot.category}</td>
+                <td className="px-6 py-4 text-gray-700">{spot.price} грн/год</td>
+                <td className="px-6 py-4">
+                  {spot.available ? (
+                    <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-700">Вільне</span>
+                  ) : (
+                    <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-700">Зайняте</span>
+                  )}
+                </td>
+                <td className="px-6 py-4">
+                  <Link href={`/dashboard/spots/${spot.id}`} className="text-slate-700 hover:underline font-medium">
+                    Переглянути
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
-  );
+  )
 }

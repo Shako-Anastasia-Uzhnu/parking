@@ -3,7 +3,8 @@ import { getParkingStats } from "@/lib/helpers";
 
 export const metadata = { title: "Dashboard" };
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  await new Promise(resolve => setTimeout(resolve, 1000))
   const stats = getParkingStats()
 
   return (
