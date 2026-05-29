@@ -73,6 +73,10 @@ export default function SpotDetailPage({ params }) {
             <h1 className="text-3xl font-bold text-gray-900">{spot.name}</h1>
           </div>
           <div className="space-x-2">
+          <Link href={`/dashboard/spots/${id}/edit`}
+          className="bg-yellow-400 text-slate-900 px-4 py-2 rounded hover:bg-yellow-300 font-semibold transition inline-block">
+            Редагувати
+          </Link>
             <button
               onClick={handleDelete}
               className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"

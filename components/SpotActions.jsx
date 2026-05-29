@@ -6,6 +6,10 @@ export default function SpotActions({ spotId }) {
   const [showConfirm, setShowConfirm] = useState(false)
   const router = useRouter()
 
+  const handleEdit = () => {
+    router.push(`/dashboard/spots/${spotId}/edit`)
+  }
+
   const handleDelete = () => {
     console.log(`Видалення місця ${spotId}`)
     setShowConfirm(false)
@@ -34,7 +38,7 @@ export default function SpotActions({ spotId }) {
 
   return (
     <div className="space-x-2">
-      <button className="bg-yellow-400 text-slate-900 px-4 py-2 rounded hover:bg-yellow-300 font-semibold cursor-pointer">
+      <button onClick={handleEdit} className="bg-yellow-400 text-slate-900 px-4 py-2 rounded hover:bg-yellow-300 font-semibold cursor-pointer">
         Редагувати
       </button>
       <button

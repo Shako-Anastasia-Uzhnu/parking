@@ -1,75 +1,53 @@
-import { NextResponse } from 'next/server'
-import { parkingSpots, addSpot } from '@/lib/parking'
+import dbConnect from '@/lib/db'
+import Spot from '@/lib/models/Spot'
 
+// GET /api/spots
+// GET /api/spots?category=A
+// GET /api/spots?search=A1
 export async function GET(request) {
+  await dbConnect()
+
   const { searchParams } = new URL(request.url)
   const category = searchParams.get('category')
   const search = searchParams.get('search')
-  const available = searchParams.get('available')
-  const sort = searchParams.get('sort')
-  const order = searchParams.get('order') || 'asc'
-  const page = Number(searchParams.get('page')) || 1
-  const limit = Number(searchParams.get('limit')) || 100
 
-  let result = [...parkingSpots]
-
+  const filter = {}
   if (category && category !== 'Всі') {
-    result = result.filter(spot => spot.category === category)
+    filter.category = category
   }
-
   if (search) {
-    result = result.filter(spot =>
-      spot.name.toLowerCase().includes(search.toLowerCase())
-    )
+    filter.name = { $regex: search, $options: 'i' }
   }
+  const spots = await Spot.find(filter).sort({createdAt: -1,})
 
-  if (available === 'true') {
-    result = result.filter(spot => spot.available)
-  }
-
-  if (sort === 'price') {
-    result.sort((a, b) => order === 'asc' ? a.price - b.price : b.price - a.price)
-  }
-
-  if (sort === 'name') {
-    result.sort((a, b) => order === 'asc'
-      ? a.name.localeCompare(b.name)
-      : b.name.localeCompare(a.name)
-    )
-  }
-
-  const total = result.length
-  const pages = Math.ceil(total / limit)
-  const start = (page - 1) * limit
-  const paginated = result.slice(start, start + limit)
-
-  return NextResponse.json({
-    data: paginated,
-    meta: { total, page, pages, limit }
+  return Response.json({
+    count: spots.length,
+    spots,
   })
 }
 
+// POST /api/spots
 export async function POST(request) {
+  await dbConnect()
+
   try {
     const body = await request.json()
+    const spot = await Spot.create(body)
 
-    if (!body.name || !body.category || !body.price) {
-      return NextResponse.json(
-        { error: "Поля name, category та price є обов'язковими" },
-        { status: 400 }
-      )
+    return Response.json(spot, {status: 201 })
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map((err) => err.message)
+      return Response.json({ errors: messages }, { status: 400 })
     }
 
-    if (typeof body.price !== 'number' || body.price <= 0) {
-      return NextResponse.json(
-        { error: 'Ціна має бути додатнім числом' },
-        { status: 400 }
-      )
+    if (error.code === 11000) {
+      return Response.json({errors: ['Паркомісце з таким номером вже існує!']},{ status: 400 })
     }
 
-    const newSpot = addSpot(body)
-    return NextResponse.json(newSpot, { status: 201 })
-  } catch {
-    return NextResponse.json({ error: 'Невалідний JSON' }, { status: 400 })
+    return Response.json(
+      { error: 'Помилка сервера' },
+      { status: 500 }
+    )
   }
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getSpotById } from "@/lib/parking";
+import { getSpotById } from "@/lib/spots";
 import FavoriteButton from "@/components/FavoriteButton";
 
 export async function generateMetadata({ params }) {

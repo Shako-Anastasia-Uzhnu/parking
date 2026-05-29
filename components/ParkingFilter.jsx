@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import ParkingCard from './ParkingCard'
-import { parkingSpots, getCategories } from '@/lib/parking'
+import { spots, getCategories } from '@/lib/spots'
 
 const categories = getCategories()
 
@@ -10,7 +10,7 @@ export default function ParkingFilter() {
   const [activeCategory, setActiveCategory] = useState('Всі')
   const [showAvailableOnly, setShowAvailableOnly] = useState(false)
 
-  const filteredItems = parkingSpots.filter(item => {
+  const filteredItems = spots.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase())
     const matchesCategory = activeCategory === 'Всі' || item.category === activeCategory
     const matchesAvailability = !showAvailableOnly || item.available
@@ -54,7 +54,7 @@ export default function ParkingFilter() {
       </label>
 
       <p className="text-sm text-gray-500 mb-4">
-        Знайдено: {filteredItems.length} з {parkingSpots.length}
+        Знайдено: {filteredItems.length} з {spots.length}
       </p>
 
       {filteredItems.length > 0 ? (
