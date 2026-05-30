@@ -1,5 +1,7 @@
 import dbConnect from '@/lib/db'
 import Spot from '@/lib/models/Spot'
+import User from "@/lib/models/User"; 
+import bcrypt from "bcryptjs";       
 
 const initialSpots = [
   {
@@ -105,12 +107,35 @@ export async function GET() {
     await dbConnect()
 
     await Spot.deleteMany({})
-
     const spots = await Spot.create(initialSpots)
 
+    await User.deleteMany({}) 
+    
+    const hashedPassword = await bcrypt.hash("password123", 10);
+
+    const users = await User.insertMany([
+      {
+        name: "Адміністратор",
+        email: "admin@test.com",
+        password: hashedPassword,
+        role: "admin",
+      },
+      {
+        name: "Користувач",
+        email: "user@test.com",
+        password: hashedPassword,
+        role: "user",
+      },
+    ]);
+
     return Response.json({
-      message: `Базу паркінгу створено: ${spots.length} місць`,
-      spots,
+      message: "Seed виконано",
+      spotsCount: spots.length,
+      usersCount: users.length,
+      testAccounts: [
+        { email: "admin@test.com", password: "password123", role: "admin" },
+        { email: "user@test.com", password: "password123", role: "user" },
+      ],
     })
   } catch (error) {
     return Response.json(

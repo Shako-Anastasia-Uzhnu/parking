@@ -1,7 +1,7 @@
 import dbConnect from '@/lib/db'
 import Spot from '@/lib/models/Spot'
+import { authorize } from "@/lib/authorize";
 
-// GET /api/spots/:id
 export async function GET(request, { params }) {
   await dbConnect()
   const { id } = await params
@@ -18,7 +18,6 @@ export async function GET(request, { params }) {
 
     return Response.json(spot)
   } catch (error) {
-    // Невалідний формат ObjectId
     return Response.json(
       { error: 'Невалідний ID' },
       { status: 400 }
@@ -26,8 +25,10 @@ export async function GET(request, { params }) {
   }
 }
 
-// PUT /api/spots/:id
 export async function PUT(request, { params }) {
+  const { session, error } = await authorize("admin");
+  if (error) return error;
+
   await dbConnect()
   const { id } = await params
 
@@ -48,20 +49,21 @@ export async function PUT(request, { params }) {
     return Response.json(spot)
   } catch (error) {
     if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors)
-        .map(err => err.message)
+      const messages = Object.values(error.errors).map(err => err.message)
       return Response.json({ errors: messages }, { status: 400 })
     }
 
     return Response.json(
-      { error: 'Помилка сервера' },
+      { error: 'Помилка сервера при оновленні паркомісця' },
       { status: 500 }
     )
   }
 }
 
-// DELETE /api/spots/:id
 export async function DELETE(request, { params }) {
+  const { session, error } = await authorize("admin");
+  if (error) return error;
+
   await dbConnect()
   const { id } = await params
 
@@ -76,7 +78,7 @@ export async function DELETE(request, { params }) {
     }
 
     return Response.json({
-      message: `Паркомісце "${spot.name}" видалено`
+      message: `Паркомісце "${spot.name}" успішно видалено з системи`
     })
   } catch (error) {
     return Response.json(

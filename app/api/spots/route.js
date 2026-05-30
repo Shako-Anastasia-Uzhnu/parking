@@ -1,5 +1,6 @@
 import dbConnect from '@/lib/db'
 import Spot from '@/lib/models/Spot'
+import { authorize } from "@/lib/authorize";
 
 // GET /api/spots
 // GET /api/spots?category=A
@@ -28,13 +29,16 @@ export async function GET(request) {
 
 // POST /api/spots
 export async function POST(request) {
+  const { session, error } = await authorize("admin");
+  if (error) return error;
+
   await dbConnect()
 
   try {
     const body = await request.json()
     const spot = await Spot.create(body)
 
-    return Response.json(spot, {status: 201 })
+    return Response.json(spot, { status: 201 })
   } catch (error) {
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map((err) => err.message)
@@ -42,11 +46,14 @@ export async function POST(request) {
     }
 
     if (error.code === 11000) {
-      return Response.json({errors: ['Паркомісце з таким номером вже існує!']},{ status: 400 })
+      return Response.json(
+        { errors: ['Паркомісце з таким номером вже існує в системі!'] },
+        { status: 400 }
+      )
     }
 
     return Response.json(
-      { error: 'Помилка сервера' },
+      { error: 'Помилка сервера при створенні місця' },
       { status: 500 }
     )
   }
