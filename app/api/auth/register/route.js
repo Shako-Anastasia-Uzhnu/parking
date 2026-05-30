@@ -1,47 +1,48 @@
-import bcrypt from 'bcryptjs'
-import dbConnect from '@/lib/db'
-import User from '@/lib/models/User'
+import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import dbConnect from "@/lib/db";
+import User from "@/lib/models/User";
+import { registerSchema } from "@/lib/validations/user";
+import { stripHtml } from "@/lib/sanitize";
 
 export async function POST(request) {
   try {
-    const { name, email, password } = await request.json()
+    await dbConnect();
 
-    if (!name || !email || !password) {
-      return Response.json(
-        { error: "Всі поля обов'язкові для реєстрації в ParkSmart" },
+    const data = await request.json();
+
+    const result = registerSchema.safeParse(data);
+    if (!result.success) {
+      const messages = result.error.issues.map((e) => e.message);
+      return NextResponse.json(
+        { error: messages.join(", ") },
         { status: 400 }
-      )
+      );
     }
 
-    if (password.length < 6) {
-      return Response.json(
-        { error: 'Пароль має бути безпечним та містити щонайменше 6 символів' },
-        { status: 400 }
-      )
-    }
+    const { email, password } = result.data;
+    
+    const name = stripHtml(result.data.name);
 
-    await dbConnect()
-
-    const existingUser = await User.findOne({ email })
-
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return Response.json(
-        { error: 'Користувач з такою email адресою вже зареєстрований в системі' },
-        { status: 409 } 
-      )
+      return NextResponse.json(
+        { error: "Користувач з такою email адресою вже зареєстрований в системі" },
+        { status: 409 }
+      );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12)
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
-    })
+    });
 
-    return Response.json(
+    return NextResponse.json(
       {
-        message: 'Реєстрація в системі ParkSmart успішна',
+        message: "Реєстрація в системі ParkSmart успішна",
         user: {
           id: user._id,
           name: user.name,
@@ -49,21 +50,18 @@ export async function POST(request) {
           role: user.role,
         },
       },
-      { status: 201 } 
-    )
+      { status: 201 }
+    );
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors)
-        .map((err) => err.message)
-      return Response.json(
-        { error: messages.join(', ') },
-        { status: 400 }
-      )
+    if (error.code === 11000) {
+      return NextResponse.json(
+        { error: "Користувач з таким email вже існує" },
+        { status: 409 }
+      );
     }
-
-    return Response.json(
-      { error: 'Помилка сервера при спробі реєстрації' },
+    return NextResponse.json(
+      { error: "Помилка сервера" },
       { status: 500 }
-    )
+    );
   }
 }

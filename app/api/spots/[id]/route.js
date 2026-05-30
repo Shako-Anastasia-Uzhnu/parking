@@ -1,6 +1,9 @@
+import { NextResponse } from "next/server";
 import dbConnect from '@/lib/db'
 import Spot from '@/lib/models/Spot'
 import { authorize } from "@/lib/authorize";
+import { updateSpotSchema } from "@/lib/validations/spot"; 
+import { sanitizeObject } from "@/lib/sanitize"; 
 
 export async function GET(request, { params }) {
   await dbConnect()
@@ -10,15 +13,15 @@ export async function GET(request, { params }) {
     const spot = await Spot.findById(id)
 
     if (!spot) {
-      return Response.json(
+      return NextResponse.json(
         { error: 'Паркомісце не знайдено' },
         { status: 404 }
       )
     }
 
-    return Response.json(spot)
+    return NextResponse.json(spot)
   } catch (error) {
-    return Response.json(
+    return NextResponse.json(
       { error: 'Невалідний ID' },
       { status: 400 }
     )
@@ -34,26 +37,31 @@ export async function PUT(request, { params }) {
 
   try {
     const body = await request.json()
-    const spot = await Spot.findByIdAndUpdate(id, body, {
+
+    const result = updateSpotSchema.safeParse(body);
+    
+    if (!result.success) {
+      const messages = result.error.issues.map(err => err.message)
+      return NextResponse.json({ errors: messages }, { status: 400 })
+    }
+
+    const sanitizedData = sanitizeObject(result.data);
+
+    const spot = await Spot.findByIdAndUpdate(id, sanitizedData, {
       new: true,
       runValidators: true,
     })
 
     if (!spot) {
-      return Response.json(
+      return NextResponse.json(
         { error: 'Паркомісце не знайдено' },
         { status: 404 }
       )
     }
 
-    return Response.json(spot)
+    return NextResponse.json(spot)
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message)
-      return Response.json({ errors: messages }, { status: 400 })
-    }
-
-    return Response.json(
+    return NextResponse.json(
       { error: 'Помилка сервера при оновленні паркомісця' },
       { status: 500 }
     )
@@ -71,17 +79,17 @@ export async function DELETE(request, { params }) {
     const spot = await Spot.findByIdAndDelete(id)
 
     if (!spot) {
-      return Response.json(
+      return NextResponse.json(
         { error: 'Паркомісце не знайдено' },
         { status: 404 }
       )
     }
 
-    return Response.json({
+    return NextResponse.json({
       message: `Паркомісце "${spot.name}" успішно видалено з системи`
     })
   } catch (error) {
-    return Response.json(
+    return NextResponse.json(
       { error: 'Невалідний ID' },
       { status: 400 }
     )

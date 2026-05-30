@@ -1,10 +1,10 @@
+import { NextResponse } from "next/server";
 import dbConnect from '@/lib/db'
 import Spot from '@/lib/models/Spot'
 import { authorize } from "@/lib/authorize";
+import { createSpotSchema } from "@/lib/validations/spot";
+import { sanitizeObject } from "@/lib/sanitize"; 
 
-// GET /api/spots
-// GET /api/spots?category=A
-// GET /api/spots?search=A1
 export async function GET(request) {
   await dbConnect()
 
@@ -19,15 +19,14 @@ export async function GET(request) {
   if (search) {
     filter.name = { $regex: search, $options: 'i' }
   }
-  const spots = await Spot.find(filter).sort({createdAt: -1,})
+  const spots = await Spot.find(filter).sort({ createdAt: -1 })
 
-  return Response.json({
+  return NextResponse.json({
     count: spots.length,
     spots,
   })
 }
 
-// POST /api/spots
 export async function POST(request) {
   const { session, error } = await authorize("admin");
   if (error) return error;
@@ -36,23 +35,35 @@ export async function POST(request) {
 
   try {
     const body = await request.json()
-    const spot = await Spot.create(body)
 
-    return Response.json(spot, { status: 201 })
+    const result = createSpotSchema.safeParse(body);
+    
+    if (!result.success) {
+      const messages = result.error.issues.map((e) => e.message);
+      return NextResponse.json({ errors: messages }, { status: 400 });
+    }
+
+    const sanitizedData = sanitizeObject(result.data);
+
+    const spot = await Spot.create(sanitizedData)
+
+    return NextResponse.json(spot, { status: 201 })
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map((err) => err.message)
-      return Response.json({ errors: messages }, { status: 400 })
+    if (error.message === "Unexpected end of JSON input" || error instanceof SyntaxError) {
+      return NextResponse.json(
+        { error: "Невалідний формат JSON у тілі запиту" },
+        { status: 400 }
+      );
     }
 
     if (error.code === 11000) {
-      return Response.json(
+      return NextResponse.json(
         { errors: ['Паркомісце з таким номером вже існує в системі!'] },
         { status: 400 }
       )
     }
 
-    return Response.json(
+    return NextResponse.json(
       { error: 'Помилка сервера при створенні місця' },
       { status: 500 }
     )
