@@ -1,6 +1,8 @@
 'use client'
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from 'next-auth/react' 
 
 const navLinks = [
   { href: "/", label: "Головна" },
@@ -11,13 +13,15 @@ const navLinks = [
 
 export default function Header() {
   const pathname = usePathname();
+  const { data: session, status } = useSession()
 
   return (
-    <header className="bg-slate-900 text-white py-4">
+    <header className="bg-slate-900 text-white py-4 shadow-md">
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link href="/" className="text-yellow-400 font-bold text-xl hover:text-yellow-300 transition">
           🅿️ ParkSmart
         </Link>
+        
         <nav className="flex items-center gap-6">
           <ul className="flex gap-6">
             {navLinks.map((link) => {
@@ -42,16 +46,31 @@ export default function Header() {
               );
             })}
           </ul>
-          <Link
-            href="/dashboard"
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
-              pathname.startsWith("/dashboard")
-                ? "bg-yellow-400 text-slate-900"
-                : "bg-slate-700 text-white hover:bg-yellow-400 hover:text-slate-900"
-            }`}
-          >
-            ⚙️ Dashboard
-          </Link>
+
+          <div className="h-5 w-[1px] bg-slate-700 hidden sm:block"></div>
+
+          {status === 'loading' ? (
+            <span className="text-gray-400 text-sm animate-pulse">...</span>
+          ) : session ? (
+            <div className="flex items-center gap-4">
+              <Link href="/dashboard" className="text-yellow-400 hover:text-white transition font-medium text-sm">
+                👤 {session.user.name}
+              </Link>
+              <button
+                onClick={() => signOut({ callbackUrl: '/' })}
+                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-xs font-semibold transition cursor-pointer"
+              >
+                Вийти
+              </button>
+            </div>
+          ) : (
+            <Link 
+              href="/auth/login" 
+              className="bg-yellow-400 hover:bg-yellow-300 text-slate-900 px-4 py-1.5 rounded text-sm font-bold transition"
+            >
+              Увійти
+            </Link>
+          )}
         </nav>
       </div>
     </header>
